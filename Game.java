@@ -8,10 +8,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -25,6 +29,8 @@ import javax.swing.border.EmptyBorder;
 public class Game implements KeyListener{
 
     // ----- Attributes -----
+    private PrintWriter out;
+    private Scanner in;
 
     // Content Pane
     private Container contentPane;
@@ -42,12 +48,79 @@ public class Game implements KeyListener{
     private boolean isCollisionDetected = false;
     private boolean controlsEnabled = true;
 
-    public static void main(String[] args) {
-        Main main = new Main();
-        main.setVisible(true);
+    public static void main(String[] args) throws IOException {
+        // Main main = new Main();
+        // main.setVisible(true);
+        // Start Server
+
+          final int SOCKET_PORT = 5656;
+          ServerSocket server = new ServerSocket(SOCKET_PORT);
+          System.out.println("Server started on port" + SOCKET_PORT);
+
+          while(true) {
+              Socket s = server.accept();
+              System.out.println("Client connected from " + s.getLocalAddress().getHostName());
+
+              FroggerService myServer = new FroggerService(s);
+              Thread t = new Thread(myServer);
+              t.start();
+          }
+      }
+
+
+  private void executeCommand(String command) {
+
+
+
+    if (command.equals("MOVEUP")) {
+      // Parse the tokens from 'in' request
+      System.out.println("MOVEUP");
+      String outCommand = "frogger.getPosY() - Properties.FROGGER_STEP";
+      out.println(outCommand);
+      out.flush();
+      return;
+    }
+    if (command.equals("MOVEDOWN")) {
+      // Parse the tokens from 'in' request
+      System.out.println("MOVEDOWN");
+      String outCommand = "frogger.getPosY() + Properties.FROGGER_STEP";
+      out.println(outCommand);
+      out.flush();
+      return;
+    }
+    if (command.equals("MOVELEFT")) {
+      // Parse the tokens from 'in' request
+      System.out.println("MOVELEFT");
+      String outCommand = "frogger.getPosX() - Properties.FROGGER_STEP";
+      out.println(outCommand);
+      out.flush();
+      return;
+    }
+    if (command.equals("MOVERIGHT")) {
+      // Parse the tokens from 'in' request
+      System.out.println("MOVERIGHT");
+      String outCommand = "frogger.getPosX() + Properties.FROGGER_STEP";
+      out.println(outCommand);
+      out.flush();
+      return;
     }
 
+    if (command.equals("GETCARS")) {
+      initializeCars(4, 250, 200, 100, 0, "bike.gif");
+      initializeCars(4, 380, 200, 200, 1, "car2.gif");
+      initializeCars(4, 440, 200, 400, 2, "car.gif");
+    }
+
+    if (command.equals("GETLOGS")) {
+      initializeLogs(4, 60, 200, 0);
+      initializeLogs(4, 124, 400, 1);
+      initializeLogs(4, 188, 800, 2);
+    }
+  }
+
     public Game() {
+
+
         // Create new window and set properties
         JFrame window = new JFrame("Frogger");
         window.setSize(Properties.SCREEN_X, Properties.SCREEN_Y);

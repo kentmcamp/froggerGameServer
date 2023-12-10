@@ -6,7 +6,7 @@ public class FroggerServer {
 
     public static void main(String[] args) throws IOException{
 
-        final int SOCKET_PORT = 5556;
+        final int SOCKET_PORT = 5656;
         ServerSocket server = new ServerSocket(SOCKET_PORT);
         System.out.println("Server started on port" + SOCKET_PORT);
 
